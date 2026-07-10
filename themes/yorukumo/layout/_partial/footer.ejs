@@ -1,0 +1,61 @@
+<footer class="footer-container">
+  <div class="footer-content">
+    <p class="footer-text">
+      © <%= new Date().getFullYear() %>
+      <a href="<%= theme.footer.authorLink %>" target="_blank"><%= theme.about.name %></a>.
+      All Rights Reserved.
+    </p>
+    <p class="footer-text">
+      Powered by <a href="https://hexo.io" target="_blank">Hexo</a> | Theme by 
+      <a href="<%= theme.footer.themeLink %>" target="_blank">ZiranHome</a>
+    </p>
+    <p class="footer-text">
+      <span data-i18n="footer.runtime"><%= __('footer.runtime') %></span>
+      <span id="runtime" class="runtime-badge"></span>
+    </p>
+  </div>
+</footer>
+
+<script>
+  function calculateRuntime() {
+    var sinceStr = '<%= theme.footer.since %>';
+    var parts = sinceStr.split('-');
+    var startTime = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    var currentTime = new Date();
+
+    var timeDiff = currentTime - startTime;
+    var days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+    var hours = Math.floor(
+      (timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+    );
+    var minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+
+    var dayStr = '<%= __("footer.day") %>';
+    var hourStr = '<%= __("footer.hour") %>';
+    var minuteStr = '<%= __("footer.minute") %>';
+    var secondStr = '<%= __("footer.second") %>';
+
+    // 如果前端 i18n 数据可用，则使用当前语言的翻译
+    if (window.I18N_DATA && typeof getCurrentLang === 'function') {
+      var lang = getCurrentLang();
+      var t = window.I18N_DATA[lang];
+      if (t) {
+        dayStr = t['footer.day'] || dayStr;
+        hourStr = t['footer.hour'] || hourStr;
+        minuteStr = t['footer.minute'] || minuteStr;
+        secondStr = t['footer.second'] || secondStr;
+      }
+    }
+
+    document.getElementById(
+      'runtime'
+    ).innerHTML = days + dayStr + hours + hourStr + minutes + minuteStr + seconds + secondStr;
+  }
+
+  // 初始运行
+  calculateRuntime();
+  // 每秒更新一次
+  setInterval(calculateRuntime, 1000);
+</script>
+

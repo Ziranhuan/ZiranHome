@@ -1,0 +1,292 @@
+// Hero Profile - CV Style Home Page
+.hero-profile
+  width 100%
+  max-width 760px
+  margin 0 auto
+  padding 3rem 2rem 2rem
+  box-sizing border-box
+  display flex
+  flex-direction column
+  gap 0.5rem
+
+// Header: avatar + name block
+.hero-header
+  display flex
+  gap 1.8rem
+  align-items flex-start
+  margin-bottom 1.5rem
+
+.hero-avatar
+  width 100px
+  height 100px
+  border-radius 50%
+  overflow hidden
+  flex-shrink 0
+  box-shadow 0 2px 12px var(--shadow-color1)
+  border 2.5px solid var(--secondary-color)
+
+  img
+    width 100%
+    height 100%
+    object-fit cover
+
+.hero-intro
+  display flex
+  flex-direction column
+  gap 0.3rem
+
+.hero-name
+  font-size 1.7rem
+  font-weight 700
+  color var(--text-color)
+  margin 0
+  line-height 1.2
+
+.hero-tagline
+  font-size 0.92rem
+  color var(--secondary-text-color)
+  margin 0
+
+.hero-school
+  font-size 0.82rem
+  color var(--secondary-text-color)
+  opacity 0.75
+  margin 0
+
+.hero-contact-row
+  display flex
+  flex-wrap wrap
+  gap 0.5rem
+  margin-top 0.6rem
+
+.hero-contact-chip
+  display inline-flex
+  align-items center
+  gap 0.4rem
+  padding 0.3rem 0.75rem
+  border-radius 2rem
+  font-size 0.78rem
+  color var(--text-color)
+  background var(--main-color)
+  border 1px solid var(--shadow-color1)
+  text-decoration none
+  transition all 0.2s ease
+
+  svg
+    width 0.9rem
+    height 0.9rem
+    flex-shrink 0
+
+  &:hover
+    border-color var(--text-color)
+    transform translateY(-1px)
+
+// CV Sections
+.cv-section
+  display flex
+  flex-direction column
+  gap 0.7rem
+  padding-top 0.5rem
+
+.cv-section-title
+  display flex
+  align-items center
+  gap 0.5rem
+  font-size 1rem
+  font-weight 700
+  color var(--text-color)
+  margin 0
+  padding-bottom 0.35rem
+  border-bottom 2px solid var(--text-color)
+
+.cv-icon
+  width 1.1rem
+  height 1.1rem
+  flex-shrink 0
+
+// CV Cards
+.cv-card
+  background var(--main-color)
+  border-radius 0.75rem
+  padding 1rem 1.2rem
+  display flex
+  flex-direction column
+  gap 0.35rem
+  box-shadow 0 1px 6px var(--shadow-color2)
+  transition transform 0.2s ease, box-shadow 0.2s ease
+
+  &:hover
+    transform translateY(-2px)
+    box-shadow 0 4px 16px var(--shadow-color1)
+
+.cv-card-compact
+  padding 0.8rem 1rem
+
+.cv-card-header
+  display flex
+  align-items center
+  gap 0.6rem
+  flex-wrap wrap
+
+.cv-status
+  display inline-flex
+  align-items center
+  padding 0.15rem 0.6rem
+  border-radius 1rem
+  font-size 0.7rem
+  font-weight 600
+  letter-spacing 0.02em
+  background var(--text-color)
+  color var(--secondary-color)
+
+.cv-venue
+  font-size 0.75rem
+  font-style italic
+  color var(--secondary-text-color)
+
+.cv-year
+  font-size 0.78rem
+  font-weight 600
+  color var(--secondary-text-color)
+
+.cv-role
+  display inline-flex
+  align-items center
+  padding 0.1rem 0.5rem
+  border-radius 1rem
+  font-size 0.68rem
+  font-weight 500
+  background var(--text-color)
+  color var(--secondary-color)
+
+.cv-period
+  font-size 0.78rem
+  color var(--secondary-text-color)
+  font-weight 500
+
+.cv-card-title
+  font-size 0.92rem
+  font-weight 600
+  color var(--text-color)
+  line-height 1.4
+  margin 0
+
+.cv-card-link
+  color inherit
+  text-decoration none
+  background-image linear-gradient(var(--text-color), var(--text-color))
+  background-size 0% 1px
+  background-position 0 100%
+  background-repeat no-repeat
+  transition background-size 0.3s ease
+
+  &:hover
+    background-size 100% 1px
+    opacity 0.8
+
+.cv-card-authors
+  font-size 0.78rem
+  color var(--secondary-text-color)
+  margin 0
+
+.cv-card-subtitle
+  font-size 0.8rem
+  color var(--secondary-text-color)
+  margin 0
+  opacity 0.7
+
+.cv-card-org
+  font-size 0.82rem
+  color var(--text-color)
+  font-weight 500
+  margin 0
+
+.cv-card-desc
+  font-size 0.78rem
+  color var(--secondary-text-color)
+  line-height 1.5
+  margin 0
+
+// Honors
+.cv-honor-item
+  display flex
+  gap 1rem
+  align-items baseline
+  padding 0.4rem 0
+
+  &:not(:last-child)
+    border-bottom 1px dashed var(--shadow-color1)
+
+.cv-honor-year
+  flex 0 0 75px
+  font-size 0.78rem
+  font-weight 600
+  color var(--secondary-text-color)
+
+.cv-honor-title
+  font-size 0.88rem
+  color var(--text-color)
+  line-height 1.4
+
+// Scroll hint
+.hero-scroll-hint
+  display flex
+  flex-direction column
+  align-items center
+  gap 0.3rem
+  margin-top 1.5rem
+  padding-top 1rem
+  border-top 1px dashed var(--shadow-color1)
+  opacity 0.4
+  transition opacity 0.3s ease
+
+  &:hover
+    opacity 0.7
+
+.hero-scroll-text
+  font-size 0.72rem
+  text-transform uppercase
+  letter-spacing 0.12em
+  color var(--text-color)
+
+.hero-scroll-arrow
+  width 1.2rem
+  height 1.2rem
+  color var(--text-color)
+  animation hero-bounce 2s ease infinite
+
+@keyframes hero-bounce
+  0%, 100%
+    transform translateY(0)
+  50%
+    transform translateY(5px)
+
+// GSAP FOUC prevention
+html:not(.no-gsap)
+  .hero-profile
+    opacity 0
+    will-change transform, opacity
+
+// Responsive
+@media (max-width: 768px)
+  .hero-profile
+    padding 1.5rem 1rem 1rem
+
+  .hero-header
+    flex-direction column
+    align-items center
+    text-align center
+    gap 1rem
+
+  .hero-name
+    font-size 1.4rem
+
+  .hero-contact-row
+    justify-content center
+
+  .cv-honor-item
+    flex-direction column
+    gap 0.2rem
+
+  .cv-honor-year
+    flex none

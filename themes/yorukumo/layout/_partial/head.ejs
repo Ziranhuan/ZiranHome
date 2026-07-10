@@ -1,0 +1,54 @@
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- 字体 (霞鹜文楷 LXGW WenKai Webfont) -->
+  <link rel="preconnect" href="https://jsd.cdn.zzko.cn" crossorigin />
+  <link
+    rel="stylesheet"
+    href="https://jsd.cdn.zzko.cn/npm/lxgw-wenkai-webfont@1.7.0/style.min.css" />
+  <!-- favicon -->
+  <%- favicon_tag(theme.favicon) %><%- css('css/style') %>
+
+  <!-- activeTitle -->
+  <% 
+    var activeTitle = page.title;
+    if (!activeTitle) {
+      if (page.category) {
+        activeTitle = page.category;
+      } else if (page.tag) {
+        activeTitle = page.tag;
+      } else if (page.archive) {
+        if (page.year) {
+          activeTitle = page.year + (page.month ? '-' + page.month : '');
+        } else {
+          activeTitle = __('menu.Archive');
+        }
+      } else {
+        activeTitle = __('activeTitle');
+      }
+    }
+  %>
+  <!-- inactiveTitle -->
+  <% var inactiveTitle = __('inactiveTitle'); %>
+
+  <title><%= activeTitle %></title>
+  <!-- 注入配置到全局变量 -->
+  <script>
+    window.SITE_CONFIG = {
+      root: '<%= config.root %>',
+      activeTitle: '<%= activeTitle %>',
+      inactiveTitle: '<%= inactiveTitle %>',
+      gsap: <%- JSON.stringify(theme.gsap || { enable: true, entrance_stagger: 0.08, scroll_trigger: true, parallax: true, hover_effect: true }) %>
+    };
+  </script>
+
+  <!-- GSAP 核心库及 ScrollTrigger 插件 (本地) -->
+  <script src="/js/gsap.min.js" onerror="document.documentElement.classList.add('no-gsap');"></script>
+  <script src="/js/ScrollTrigger.min.js" onerror="document.documentElement.classList.add('no-gsap');"></script>
+  <script>
+    if (typeof gsap === 'undefined') { document.documentElement.classList.add('no-gsap'); }
+  </script>
+
+  <!-- 加载JS文件 -->
+  <%- js(['js/head.js', 'js/iconfont.js','js/header.js', 'js/i18n.js']) %>
+</head>

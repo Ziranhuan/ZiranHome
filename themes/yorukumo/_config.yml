@@ -1,0 +1,100 @@
+# 网站 | website
+favicon: /images/favicon.ico
+logo:
+title: ZiranHome
+
+# 菜单 | menu
+menu:
+  Home: /
+  Posts: /posts
+  Stats: /stats
+  About: /about
+
+# 轮播图 | swiper
+swiper:
+  image: /images/swiper.jpg
+  title: 轮播图
+
+# 页面布局
+layout:
+  stats: stats
+  archive: archive
+  category: category
+  about: about
+
+# 页脚 | footer
+footer:
+  count:
+  since: '2026-07-11'
+  authorLink: https://github.com/asukacc
+  themeLink: https://github.com/asukacc/ZiranHome
+
+# 关于页面配置
+about:
+  name: 'Wei, H.'
+  description: 'AI Researcher & Engineer'
+  avatar: /images/avatar.jpg
+  email: 'huanchengwei131@161.com'
+  wechat: 'Ziranhuan177'
+  qq: '1224781266'
+  github: 'https://github.com/Ziranhuan'
+  linkedin: ''
+
+# 首页个人信息展示 | Home Profile Hero (CV Style)
+profile:
+  name: 'Wei, H.'
+  avatar: /images/avatar.jpg
+  tagline: 'AI Researcher & Engineer'
+  school: 'Nanchang University (211 / Double First-Class)'
+
+  research:
+    - status: 'Under Review'
+      title: 'Timeliness Analysis for Digital Twin Synchronization in Semantic Communication-enabled Satellite-Terrestrial Vehicular Networks'
+      venue: 'IEEE Communications Letters'
+      authors: 'Wei, H.; Liang, X.'
+    - status: 'ISCAIT 2026'
+      title: 'An Event-Driven Greedy Scheduling Framework with Full-Surface Occlusion Certification for UAV-Deployed Obscurant Screening'
+      venue: ''
+      authors: 'Wei, H.; Duan, J.; Zhang, H.'
+      link: 'https://ieeexplore.ieee.org/document/11477337/'
+
+  projects:
+    - year: '2025'
+      title: 'Ganshui Youyou: Nanchang Smart Cultural Tourism Mini Program'
+      title_cn: '赣水悠悠：南昌智慧文旅小程序'
+      role: 'Project Lead'
+
+  experience:
+    - period: '2025.05 - Present'
+      title: 'AI Intern'
+      org: 'Jiangxi Zheding Technology Co., Ltd.'
+      desc: 'Operations management, market strategy planning, and core business coordination.'
+    - period: '2025.10 - Present'
+      title: 'AI Intern'
+      org: 'Jiangxi Jiuzhou Education Technology Co., Ltd.'
+      desc: 'Technical team management and R&D work.'
+
+  media_coverage:
+    - outlet: 'China Daily'
+      title: 'Smart Cultural Tourism Service Breakthrough'
+      meta: 'May 22, 2026 / China Daily, reposted from Hebei Youth Daily'
+      link: 'https://cnews.chinadaily.com.cn/a/202605/22/WS6a0fcbd5a310942cc49adaf6.html'
+    - outlet: 'Dajiang News'
+      title: 'Related Coverage'
+      meta: 'Dajiang News / regional media link'
+      link: 'https://dzb.ncu.edu.cn/info/1029/1823.htm'
+
+  honors: []
+
+  contact:
+    email: 'huanchengwei131@161.com'
+    github: 'https://github.com/Ziranhuan'
+
+# GSAP 动画配置 | GSAP Animations Configuration
+gsap:
+  enable: true # 是否启用 GSAP 动画
+  entrance_stagger: 0.08 # 列表项进场动画交错时间 (秒)
+  scroll_trigger: true # 是否启用滚动触发渐现动画
+  parallax: true # 是否启用顶部 Banner 视差滚动效果
+  hover_effect: true # 是否启用卡片悬浮 GSAP 交互效果
+

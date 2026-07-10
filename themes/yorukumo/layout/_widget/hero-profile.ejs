@@ -1,0 +1,146 @@
+<% if (theme.profile) { %>
+<section class="hero-profile">
+  <!-- Header: Avatar + Name + Tagline -->
+  <div class="hero-header">
+    <div class="hero-avatar">
+      <img src="<%= url_for(theme.profile.avatar) %>" alt="<%= theme.profile.name %>" />
+    </div>
+    <div class="hero-intro">
+      <h1 class="hero-name"><%= theme.profile.name %></h1>
+      <p class="hero-tagline" data-i18n="profile.tagline"><%= theme.profile.tagline %></p>
+      <p class="hero-school" data-i18n="profile.school"><%= theme.profile.school %></p>
+      <div class="hero-contact-row">
+        <% if (theme.profile.contact && theme.profile.contact.email) { %>
+        <a href="mailto:<%= theme.profile.contact.email %>" class="hero-contact-chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <span><%= theme.profile.contact.email %></span>
+        </a>
+        <% } %>
+        <% if (theme.profile.contact && theme.profile.contact.github) { %>
+        <a href="<%= theme.profile.contact.github %>" target="_blank" rel="noopener" class="hero-contact-chip">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          <span>GitHub</span>
+        </a>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Research Section -->
+  <% if (theme.profile.research && theme.profile.research.length) { %>
+  <div class="cv-section">
+    <h2 class="cv-section-title">
+      <svg class="cv-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/>
+      </svg>
+      <span data-i18n="profile.research">Research</span>
+    </h2>
+    <% theme.profile.research.forEach(function(pub){ %>
+    <div class="cv-card">
+      <div class="cv-card-header">
+        <span class="cv-status" data-i18n="profile.status.<%= pub.status %>"><%= pub.status %></span>
+        <span class="cv-venue"><%= pub.venue %></span>
+      </div>
+      <% if (pub.link) { %>
+      <h3 class="cv-card-title"><a href="<%= pub.link %>" target="_blank" rel="noopener" class="cv-card-link"><%= pub.title %></a></h3>
+      <% } else { %>
+      <h3 class="cv-card-title"><%= pub.title %></h3>
+      <% } %>
+      <p class="cv-card-authors"><%= pub.authors %></p>
+    </div>
+    <% }); %>
+  </div>
+  <% } %>
+
+  <!-- Projects Section -->
+  <% if (theme.profile.projects && theme.profile.projects.length) { %>
+  <div class="cv-section">
+    <h2 class="cv-section-title">
+      <svg class="cv-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+      </svg>
+      <span data-i18n="profile.projects">Projects</span>
+    </h2>
+    <% theme.profile.projects.forEach(function(proj, idx){ %>
+    <div class="cv-card cv-card-compact">
+      <div class="cv-card-header">
+        <span class="cv-year"><%= proj.year %></span>
+        <span class="cv-role" data-i18n="profile.projects.<%= idx %>.role"><%= proj.role %></span>
+      </div>
+      <h3 class="cv-card-title" data-i18n="profile.projects.<%= idx %>.title"><%= proj.title %></h3>
+      <% if (proj.title_cn) { %><p class="cv-card-subtitle" data-i18n="profile.projects.<%= idx %>.subtitle"><%= proj.title_cn %></p><% } %>
+    </div>
+    <% }); %>
+  </div>
+  <% } %>
+
+  <!-- Experience Section -->
+  <% if (theme.profile.experience && theme.profile.experience.length) { %>
+  <div class="cv-section">
+    <h2 class="cv-section-title">
+      <svg class="cv-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/>
+      </svg>
+      <span data-i18n="profile.experience">Experience</span>
+    </h2>
+    <% theme.profile.experience.forEach(function(exp, idx){ %>
+    <div class="cv-card cv-card-compact">
+      <div class="cv-card-header">
+        <span class="cv-period"><%= exp.period %></span>
+      </div>
+      <h3 class="cv-card-title" data-i18n="profile.exp.<%= idx %>.title"><%= exp.title %></h3>
+      <p class="cv-card-org" data-i18n="profile.exp.<%= idx %>.org"><%= exp.org %></p>
+      <p class="cv-card-desc" data-i18n="profile.exp.<%= idx %>.desc"><%= exp.desc %></p>
+    </div>
+    <% }); %>
+  </div>
+  <% } %>
+
+  <!-- Media Coverage Section -->
+  <% if (theme.profile.media_coverage && theme.profile.media_coverage.length) { %>
+  <div class="cv-section">
+    <h2 class="cv-section-title">
+      <svg class="cv-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 11-5.8-1.6"/>
+      </svg>
+      <span data-i18n="profile.mediaCoverage">Media Coverage</span>
+    </h2>
+    <% theme.profile.media_coverage.forEach(function(m, idx){ %>
+    <div class="cv-card cv-card-compact">
+      <div class="cv-card-header">
+        <span class="cv-status"><%= m.outlet %></span>
+      </div>
+      <h3 class="cv-card-title"><a href="<%= m.link %>" target="_blank" rel="noopener" class="cv-card-link" data-i18n="profile.media.<%= idx %>.title"><%= m.title %></a></h3>
+      <p class="cv-card-desc" data-i18n="profile.media.<%= idx %>.meta"><%= m.meta %></p>
+    </div>
+    <% }); %>
+  </div>
+  <% } %>
+
+  <!-- Honors Section -->
+  <% if (theme.profile.honors && theme.profile.honors.length) { %>
+  <div class="cv-section">
+    <h2 class="cv-section-title">
+      <svg class="cv-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>
+      </svg>
+      <span data-i18n="profile.honors">Honors</span>
+    </h2>
+    <% theme.profile.honors.forEach(function(h){ %>
+    <div class="cv-honor-item">
+      <span class="cv-honor-year"><%= h.year %></span>
+      <span class="cv-honor-title"><%= h.title %></span>
+    </div>
+    <% }); %>
+  </div>
+  <% } %>
+
+  <!-- Scroll hint -->
+  <div class="hero-scroll-hint">
+    <span class="hero-scroll-text" data-i18n="profile.scrollHint">Scroll to explore posts</span>
+    <svg class="hero-scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="6 9 12 15 18 9"/>
+    </svg>
+  </div>
+</section>
+<% } %>

@@ -1,0 +1,15 @@
+{
+  "name": "hexo-theme-yoruumo",
+  "version": "1.0.0",
+  "description": "Hexo Theme Landscape",
+  "repository": "CreativityUnlimited/hexo-theme-ZiranHome",
+  "keywords": [
+    "hexo",
+    "theme",
+    "ZiranHome"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "hexo-renderer-stylus": "^2.1.0"
+  }
+}
