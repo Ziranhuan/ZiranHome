@@ -337,6 +337,7 @@
   .lang-switcher
     width 100%
     display block
+    box-sizing border-box
     padding 0 2rem 0.75rem 2rem
 
   .lang-btn
@@ -344,6 +345,7 @@
     align-items center
     justify-content center
     width 100%
+    box-sizing border-box
     font-size 1.25rem
     font-weight 600
     padding 0.8rem 1.5rem
@@ -361,30 +363,25 @@
     position static
     transform none
     width 100%
-    opacity 0
-    visibility hidden
-    max-height 0
-    overflow hidden
+    box-sizing border-box
+    display none
     box-shadow none
     border none
     background var(--shadow-color2)
     border-radius 12px
-    transition opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease, margin-top 0.3s ease
+    margin-top 0.5rem
 
     &.active
-      opacity 1
-      visibility visible
-      max-height 200px
-      margin-top 0.5rem
+      display block
 
   .lang-option
     display block
     width 100%
+    box-sizing border-box
     padding 0.7rem 1rem
     border-radius 8px
     margin 0.25rem 0
     text-align center
-    box-sizing border-box
 
     &:hover, &:active
       background var(--shadow-color1)
