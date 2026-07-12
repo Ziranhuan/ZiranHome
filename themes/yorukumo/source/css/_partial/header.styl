@@ -360,6 +360,7 @@
   .lang-dropdown
     position static
     transform none
+    width 100%
     opacity 0
     visibility hidden
     max-height 0
@@ -377,9 +378,13 @@
       margin-top 0.5rem
 
   .lang-option
+    display block
+    width 100%
     padding 0.7rem 1rem
     border-radius 8px
-    margin 0.25rem 0.5rem
+    margin 0.25rem 0
+    text-align center
+    box-sizing border-box
 
     &:hover, &:active
       background var(--shadow-color1)
