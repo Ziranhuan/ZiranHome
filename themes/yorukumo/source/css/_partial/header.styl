@@ -356,13 +356,21 @@
   .lang-dropdown
     position static
     transform none
-    opacity 1
-    visibility visible
-    margin-top 0.5rem
+    opacity 0
+    visibility hidden
+    max-height 0
+    overflow hidden
     box-shadow none
     border none
     background var(--shadow-color2)
     border-radius 12px
+    transition opacity 0.3s ease, visibility 0.3s ease, max-height 0.3s ease, margin-top 0.3s ease
+
+    &.active
+      opacity 1
+      visibility visible
+      max-height 200px
+      margin-top 0.5rem
 
   .lang-option
     padding 0.7rem 1rem
