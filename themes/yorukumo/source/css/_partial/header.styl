@@ -361,6 +361,8 @@
 
   .lang-dropdown
     position static
+    top auto
+    left auto
     transform none
     width 100%
     box-sizing border-box
@@ -369,19 +371,21 @@
     border none
     background var(--shadow-color2)
     border-radius 12px
-    margin-top 0.5rem
+    text-align center
 
     &.active
       display block
 
   .lang-option
-    display block
+    display flex
+    align-items center
+    justify-content center
     width 100%
     box-sizing border-box
     padding 0.7rem 1rem
     border-radius 8px
     margin 0.25rem 0
-    text-align center
+    text-decoration none
 
     &:hover, &:active
       background var(--shadow-color1)
