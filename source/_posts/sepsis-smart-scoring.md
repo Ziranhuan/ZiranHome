@@ -61,7 +61,7 @@ categories:
 
 ### 3.2 Day-1 分层结果
 
-![Day-1 KM生存曲线](/ZiranHome/images/sepsis-km-day1.png)
+![Day-1 KM生存曲线](/images/sepsis-km-day1.png)
 
 **全部汇池（28天死亡率随分层递增）：**
 
@@ -76,7 +76,7 @@ categories:
 
 ### 3.3 前3天动态分层结果
 
-![Days1-3 KM生存曲线](/ZiranHome/images/sepsis-km-days1-3.png)
+![Days1-3 KM生存曲线](/images/sepsis-km-days1-3.png)
 
 **全部汇池（前3天动态分层）：**
 
@@ -124,7 +124,7 @@ categories:
 
 ### 4.3 结果
 
-![五评分ROC对比](/ZiranHome/images/sepsis-roc-five-scores.png)
+![五评分ROC对比](/images/sepsis-roc-five-scores.png)
 
 **三库汇池 AUROC 对比：**
 
@@ -146,7 +146,177 @@ SMART **单日静态**区分中等（~0.64），与NEWS2相当，明显优于SIR
 
 ---
 
-## 五、当前局限
+## 五、评分关键代码与评分标准
+
+### 5.1 统一评分模块（`scripts/44_scores.py`）
+
+三库采用同一公式计算 NEWS2 / SOFA / SOFA-2 / SIRS，单位统一为：胆红素 & 肌酐 = mg/dL，升压药 = μg/kg/min。SMART 评分（8项标志物 + 年龄分箱）由项目主分析模块另算。
+
+```python
+# -*- coding: utf-8 -*-
+"""44 五评分统一计算模块: NEWS2 / SOFA / SOFA-2 / SIRS  (+SMART另算)
+   对三库同一公式, 单位: 胆红素&肌酐=mg/dL, NE/Epi=μg/kg/min"""
+import numpy as np, pandas as pd
+
+def _n(v):  # NaN安全
+    return None if (v is None or (isinstance(v,float) and np.isnan(v))) else v
+
+# ---------- SIRS (0-4, ≥2阳性) ----------
+def sirs(r):
+    t=_n(r.get('temp_max')); tl=_n(r.get('temp_min')); hr=_n(r.get('heart_rate_max'))
+    rr=_n(r.get('resp_rate_max')); paco2=_n(r.get('paco2_min'))
+    wl=_n(r.get('wbc_min')); wh=_n(r.get('wbc_max'))
+    if any(x is None for x in [t,hr,rr]) or (wl is None and wh is None): return np.nan
+    s=0
+    if (t and t>38) or (tl and tl<36): s+=1
+    if hr>90: s+=1
+    if rr>20 or (paco2 and paco2<32): s+=1
+    if (wh and wh>12) or (wl and wl<4): s+=1
+    return s
+
+# ---------- NEWS2 (scale1, 0-20) ----------
+def news2(r):
+    rr=_n(r.get('resp_rate_max')); spo2=_n(r.get('spo2_min')); temp=_n(r.get('temp_min'))
+    sbp=_n(r.get('sbp_min')); hr=_n(r.get('heart_rate_max')); gcs=_n(r.get('gcs_min'))
+    o2=1 if (r.get('vent_flag')==1 or (_n(r.get('fio2_pct')) and r['fio2_pct']>21)) else 0
+    if any(x is None for x in [rr,spo2,temp,sbp,hr,gcs]): return np.nan
+    s=0
+    s+= 3 if rr<=8 else 1 if rr<=11 else 0 if rr<=20 else 2 if rr<=24 else 3
+    s+= 0 if spo2>=96 else 1 if spo2>=94 else 2 if spo2>=92 else 3
+    s+= 2 if o2 else 0
+    s+= 3 if temp<=35.0 else 1 if temp<=36.0 else 0 if temp<=38.0 else 1 if temp<=39.0 else 2
+    s+= 3 if sbp<=90 else 2 if sbp<=100 else 1 if sbp<=110 else 0 if sbp<=219 else 3
+    s+= 3 if hr<=40 else 1 if hr<=50 else 0 if hr<=90 else 1 if hr<=110 else 2 if hr<=130 else 3
+    s+= 0 if gcs>=15 else 3
+    return s
+
+# ---------- SOFA (原版, 0-24) ----------
+def _resp_sofa(pf, vent):
+    if pf is None: return 0
+    if pf>=400: return 0
+    if pf>=300: return 1
+    if pf>=200: return 2
+    if pf>=100: return 3 if vent else 2
+    return 4 if vent else 2
+def _cardio_sofa(mbp, ne, epi, dopa_pres, dobu_pres):
+    ne=ne or 0; epi=epi or 0
+    if dopa_pres or ne>0.1 or epi>0.1:  # 需要剂量细分
+        if ne>0.1 or epi>0.1: return 4
+        return 3  # dopamine>5近似
+    if (ne>0 and ne<=0.1) or (epi>0 and epi<=0.1) or dobu_pres: return 2
+    if mbp is not None and mbp<70: return 1
+    return 0
+def sofa(r):
+    pf=_n(r.get('pao2fio2ratio_min')); plt=_n(r.get('platelets_min')); bili=_n(r.get('bilirubin_max'))
+    mbp=_n(r.get('mbp_min')); gcs=_n(r.get('gcs_min')); cr=_n(r.get('creatinine_max'))
+    if any(x is None for x in [plt,bili,gcs,cr]): return np.nan
+    resp=_resp_sofa(pf, r.get('vent_flag')==1)
+    coag= 0 if plt>=150 else 1 if plt>=100 else 2 if plt>=50 else 3 if plt>=20 else 4
+    liver=0 if bili<1.2 else 1 if bili<2.0 else 2 if bili<6.0 else 3 if bili<12.0 else 4
+    card=_cardio_sofa(mbp, _n(r.get('ne_rate')), _n(r.get('epi_rate')),
+                      r.get('other_pressor_present')==1, r.get('inotrope_present')==1)
+    cns= 0 if gcs>=15 else 1 if gcs>=13 else 2 if gcs>=10 else 3 if gcs>=6 else 4
+    ren= 0 if cr<1.2 else 1 if cr<2.0 else 2 if cr<3.5 else 3 if cr<5.0 else 4
+    return resp+coag+liver+card+cns+ren
+
+# ---------- SOFA-2 (2025新版, 见SOFA2.txt) ----------
+def _resp_sofa2(pf, vent):
+    # 3/4分均"且需要高级通气支持"; 无支持则封顶2分(≤225档)
+    if pf is None: return 0
+    if pf>300: return 0
+    if pf>225: return 1
+    if pf>150: return 2
+    if pf>75:  return 3 if vent else 2   # ≤150
+    return 4 if vent else 2              # ≤75 无支持→2(修正: 原误为3)
+def _cardio_sofa2(mbp, ne, epi, other, ino, mcs=False):
+    s=(ne or 0)+(epi or 0)  # NE+Epi 之和 μg/kg/min
+    combo = bool(other or ino)           # 联用其他血管活性/正性肌力药
+    if mcs: return 4                      # 机械循环支持(数据缺口, 恒False)
+    if s>0.4: return 4
+    if s>0.2: return 4 if combo else 3    # 中剂量: 联用→4, 否则3
+    if s>0:   return 3 if combo else 2    # 低剂量: 联用→3, 否则2
+    if combo: return 2                    # 仅其他药(任意剂量)→2
+    if mbp is not None and mbp<70: return 1
+    return 0
+def sofa2(r):
+    pf=_n(r.get('pao2fio2ratio_min')); plt=_n(r.get('platelets_min')); bili=_n(r.get('bilirubin_max'))
+    mbp=_n(r.get('mbp_min')); gcs=_n(r.get('gcs_min')); cr=_n(r.get('creatinine_max')); rrt=r.get('rrt_flag')==1
+    if any(x is None for x in [plt,bili,gcs,cr]): return np.nan
+    resp=_resp_sofa2(pf, r.get('vent_flag')==1)
+    coag= 0 if plt>150 else 1 if plt>100 else 2 if plt>80 else 3 if plt>50 else 4
+    liver=0 if bili<=1.2 else 1 if bili<=3.0 else 2 if bili<=6.0 else 3 if bili<=12.0 else 4
+    card=_cardio_sofa2(mbp, _n(r.get('ne_rate')), _n(r.get('epi_rate')),
+                       r.get('other_pressor_present')==1, r.get('inotrope_present')==1)
+    cns= 0 if gcs>=15 else 1 if gcs>=13 else 2 if gcs>=9 else 3 if gcs>=6 else 4
+    ren= 4 if rrt else 0 if cr<=1.2 else 1 if cr<=2.0 else 2 if cr<=3.5 else 3
+    return resp+coag+liver+card+cns+ren
+```
+
+### 5.2 SIRS 评分标准（0–4分，≥2分阳性）
+
+| 指标 | 阳性阈值 |
+|---|---|
+| 体温 | >38°C 或 <36°C |
+| 心率 | >90 次/分 |
+| 呼吸频率 | >20 次/分 或 PaCO₂ <32 mmHg |
+| 白细胞 (WBC) | >12×10⁹/L 或 <4×10⁹/L |
+
+> 每项阳性计1分，总分0–4；≥2分符合SIRS诊断标准。
+
+### 5.3 NEWS2 评分标准（Scale 1，0–20分）
+
+| 指标 | 3分 | 2分 | 1分 | 0分 | 1分 | 2分 | 3分 |
+|---|---|---|---|---|---|---|---|
+| 呼吸频率（次/分） | ≤8 | — | 9–11 | 12–20 | — | 21–24 | ≥25 |
+| SpO₂ Scale1（%） | ≤91 | 92–93 | 94–95 | ≥96 | — | — | — |
+| 吸氧 | — | 是 | — | 否 | — | — | — |
+| 体温（°C） | ≤35.0 | — | 35.1–36.0 | 36.1–38.0 | 38.1–39.0 | ≥39.1 | — |
+| 收缩压（mmHg） | ≤90 | 91–100 | 101–110 | 111–219 | — | — | ≥220 |
+| 心率（次/分） | ≤40 | — | 41–50 | 51–90 | 91–110 | 111–130 | ≥131 |
+| 意识（GCS） | — | — | — | 15分 | — | — | <15分 |
+
+### 5.4 SOFA 评分标准（原版，0–24分）
+
+| 系统 | 0分 | 1分 | 2分 | 3分 | 4分 |
+|---|---|---|---|---|---|
+| 呼吸 PaO₂/FiO₂ (mmHg) | ≥400 | 300–399 | 200–299 | 100–199 + 机械通气 | <100 + 机械通气 |
+| 凝血 血小板 (×10⁹/L) | ≥150 | 100–149 | 50–99 | 20–49 | <20 |
+| 肝脏 胆红素 (mg/dL) | <1.2 | 1.2–1.9 | 2.0–5.9 | 6.0–11.9 | ≥12.0 |
+| 循环 | MAP ≥70 无升压药 | MAP <70 | 多巴胺/多巴酚丁胺（任意）或 NE/Epi ≤0.1 | 多巴胺 >5 或 NE/Epi >0.1（中剂量） | NE/Epi >0.1（高剂量） |
+| 中枢神经 GCS | 15 | 13–14 | 10–12 | 6–9 | <6 |
+| 肾脏 肌酐 (mg/dL) | <1.2 | 1.2–1.9 | 2.0–3.4 | 3.5–4.9 | ≥5.0 |
+
+> 呼吸系统：无机械通气时 <200 mmHg 封顶2分。循环系统升压药单位 μg/kg/min。
+
+### 5.5 SOFA-2 评分标准（2025新版，0–24分）
+
+| 系统 | 0分 | 1分 | 2分 | 3分 | 4分 |
+|---|---|---|---|---|---|
+| 呼吸 PaO₂/FiO₂ (mmHg) | >300 | 226–300 | 151–225 | 76–150 + 高级通气 | ≤75 + 高级通气 |
+| 凝血 血小板 (×10⁹/L) | >150 | 101–150 | 81–100 | 51–80 | ≤50 |
+| 肝脏 胆红素 (mg/dL) | ≤1.2 | 1.3–3.0 | 3.1–6.0 | 6.1–12.0 | >12.0 |
+| 循环 NE+Epi之和 (μg/kg/min) | 无升压药 且 MAP≥70 | MAP<70 | 低剂量 ≤0.2（单用）或仅其他药 | 中剂量 0.2–0.4（单用）或低剂量联用 | 高剂量 >0.4 或 中剂量联用 或 MCS |
+| 中枢神经 GCS | 15 | 13–14 | 9–12 | 6–8 | <6 |
+| 肾脏 肌酐 (mg/dL) / RRT | ≤1.2 | 1.3–2.0 | 2.1–3.5 | >3.5 | RRT（任意肌酐） |
+
+> 与原版SOFA的关键差异：①呼吸阈值更严（<200无通气封顶2分，3/4分需高级通气支持）；②循环以NE+Epi之和计算（0.2/0.4阈值），联用其他药升级；③肾脏RRT直接判4分；④凝血/肝脏/CNS阈值微调。
+
+### 5.6 SMART 评分标准（8项标志物 + 年龄分箱，0–13分）
+
+SMART评分基于**炎症-凝血轴**的8项生物标志物（含淋巴细胞、中性粒细胞、单核细胞等白细胞分类及其他炎症凝血指标）结合年龄分箱计算，总分0–13分。分层阈值：
+
+| 分层 | 分值 | 28天死亡率（Day1） |
+|---|---|---|
+| Mild（轻度） | 0–2 | 11.3% |
+| Moderate（中度） | 3–4 | 16.3% |
+| Severe（重度） | 5–7 | 25.7% |
+| Dangerous（危险） | ≥8 | 40.3% |
+
+> SMART评分的具体阈值与权重由项目主分析模块统一计算，其核心价值在于**前3天动态轨迹**而非单日静态分值。
+
+---
+
+## 六、当前局限
 
 1. **禁插值 → 完整病例损失**：MIMIC Day1可分层降至约70%（五分类第1天未测齐者被排除）；AUROC完整病例9,900例受SMART五分类（44%）与SOFA胆红素/PF比（59%）限制，存在选择性
 2. **生存口径不统一**：MIMIC为真28天，eICU/私有为院内（出院即删失），汇池时口径混合
@@ -155,7 +325,7 @@ SMART **单日静态**区分中等（~0.64），与NEWS2相当，明显优于SIR
 
 ---
 
-## 六、下一步方向
+## 七、下一步方向
 
 - SMART **前3天动态版** vs 静态评分再做一次AUROC（更能体现SMART价值）
 - 前3天分组做 **landmark分析**（从第3天起算，避免不朽时间偏倚）
@@ -164,7 +334,7 @@ SMART **单日静态**区分中等（~0.64），与NEWS2相当，明显优于SIR
 
 ---
 
-## 七、产出文件索引
+## 八、产出文件索引
 
 **生存分析** `out/survival/`
 - 生存分析_禁插值_全部/MIMIC/eICU/私有.xlsx — SPSS就绪
